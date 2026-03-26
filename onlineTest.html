@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online Test Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    :root {
+      --primary-color: #4e54c8; /* Modern Purple-Blue */
+      --secondary-color: #8f94fb;
+      --accent-color: #ff6b6b;
+      --text-color: #333;
+      --bg-color: #f4f7f6;
+      --white: #ffffff;
+      --success: #28a745;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Header Styling */
+    header {
+      width: 100%;
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: var(--white);
+      padding: 15px 0;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 700px;
+      background: var(--white);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    /* Start Screen Styling */
+    #nameInput {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .chapterName {
+      color: var(--primary-color);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 10px 0 30px;
+      font-size: 28px;
+      color: #333;
+      border: none;
+      background: none;
+      font-weight: 700;
+    }
+
+    #studentName {
+      width: 80%;
+      padding: 15px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 30px;
+      outline: none;
+      transition: 0.3s;
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+    }
+
+    #studentName:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(78, 84, 200, 0.2);
+    }
+
+    .start-btn {
+      margin-top: 20px;
+      padding: 12px 40px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(78, 84, 200, 0.3);
+      background: #3b40a1;
+    }
+
+    /* Quiz Container Styling */
+    #testContainer {
+      display: none;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    #timer {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent-color);
+      background: #fff0f0;
+      padding: 5px 15px;
+      border-radius: 20px;
+    }
+
+    /* Progress Bar */
+    #progressBar {
+      width: 100%;
+      background-color: #e9ecef;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    #progressBar div {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Questions & Options */
+    .question {
+      font-size: 18px;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Option Cards Styling */
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+
+    .option-label:hover {
+      background-color: #f8f9fa;
+      border-color: #ccc;
+    }
+
+    /* Hide default radio button */
+    .option-label input[type="radio"] {
+      display: none;
+    }
+
+    /* Custom Radio Circle */
+    .custom-radio {
+      height: 20px;
+      width: 20px;
+      border: 2px solid #adb5bd;
+      border-radius: 50%;
+      margin-right: 15px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .custom-radio::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 10px;
+      height: 10px;
+      background-color: var(--white);
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+
+    /* Checked State */
+    .option-label input:checked + .custom-radio {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .option-label input:checked + .custom-radio::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .option-label input:checked ~ span {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+    
+    .option-label.selected {
+      border-color: var(--primary-color);
+      background-color: #f0f2ff;
+    }
+
+    .option-text {
+      font-size: 15px;
+      color: #555;
+    }
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .nav-btn {
+      padding: 12px 25px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .nav-btn.prev {
+      background-color: #e9ecef;
+      color: #666;
+    }
+    .nav-btn.prev:hover:not(:disabled) {
+      background-color: #dbe2e8;
+    }
+    .nav-btn.prev:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .nav-btn.next {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    .nav-btn.next:hover {
+      background-color: #3b40a1;
+      transform: translateY(-1px);
+    }
+
+    /* SweetAlert Customization Override */
+    div:where(.swal2-container) div:where(.swal2-popup) {
+      font-family: 'Poppins', sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dream Success Classes</h1>
+  </header>
+
+  <div class="container">
+    
+    <div id="nameInput">
+      <div class="chapterName">Subject: General Knowledge</div>
+      <h2>Quiz : By Rahul Kumar</h2>
+      <p style="color:#666; margin-bottom:20px;">Enter your details to begin the assessment.</p>
+      
+      <input type="text" id="studentName" placeholder="Enter Full Name" required autocomplete="off">
+      <br>
+      <button class="start-btn" onclick="startTest()">Start Test</button>
+    </div>
+
+    <div id="testContainer">
+      <div class="top-bar">
+        <span id="testTitle" style="font-weight: 600; color: var(--primary-color);">G.K. Test</span>
+        <div id="timer">⏱ 10:00</div>
+      </div>
+      
+      <div id="progressBar"><div></div></div>
+      
+      <div id="quiz">
+        </div>
+
+      <div class="buttons">
+        <button id="prevBtn" class="nav-btn prev" onclick="previousQuestion()">Previous</button>
+        <button id="nextButton" class="nav-btn next" onclick="nextQuestion()">Next</button>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  // ==========================
+  // Question Data
+  // ==========================
+  const questions = 
+  [{ "question": "भारत में वर्तमान में कुल कितने प्रमुख बंदरगाह (Major Ports) हैं —", 
+  "options": ["10", "12", "13", "15"], 
+  "answer": "13" },
+
+{ "question": "भारत का सबसे पुराना कृत्रिम (Artificial) बंदरगाह कौन सा है —", 
+  "options": ["मुंबई", "चेन्नई", "कांडला", "विशाखापत्तनम"], 
+  "answer": "चेन्नई" },
+
+{ "question": "'Gateway of India' के रूप में किस बंदरगाह को जाना जाता है —", 
+  "options": ["कोलकाता", "कांडला", "मुंबई", "कोच्चि"], 
+  "answer": "मुंबई" },
+
+{ "question": "भारत का सबसे बड़ा कंटेनर पोर्ट (न्हावा शेवा) कौन सा है —", 
+  "options": ["जवाहरलाल नेहरू पोर्ट", "एन्नोर पोर्ट", "पारादीप पोर्ट", "तूतीकोरिन पोर्ट"], 
+  "answer": "जवाहरलाल नेहरू पोर्ट" },
+
+{ "question": "कांडला बंदरगाह का नया नाम क्या रखा गया है —", 
+  "options": ["श्यामा प्रसाद मुखर्जी पोर्ट", "दीनदयाल पोर्ट", "कामराजार पोर्ट", "वी.ओ. चिदंबरनार पोर्ट"], 
+  "answer": "दीनदयाल पोर्ट" },
+
+{ "question": "भारत का सबसे गहरा स्थल-रुद्ध और सुरक्षित बंदरगाह कौन सा है —", 
+  "options": ["चेन्नई", "पारादीप", "विशाखापत्तनम", "मोरमुगाओ"], 
+  "answer": "विशाखापत्तनम" },
+
+{ "question": "नदी-बंदरगाह (Riverine Port) का उदाहरण कौन सा है —", 
+  "options": ["कोच्चि", "कोलकाता", "कांडला", "तूतीकोरिन"], 
+  "answer": "कोलकाता" },
+
+{ "question": "'अरब सागर की रानी' किस बंदरगाह को कहा जाता है —", 
+  "options": ["मंगलौर", "कोच्चि", "मुंबई", "सूरत"], 
+  "answer": "कोच्चि" },
+
+{ "question": "भारत का पहला कॉर्पोरेट बंदरगाह कौन सा है —", 
+  "options": ["एन्नोर", "हल्दिया", "पारादीप", "पोर्ट ब्लेयर"], 
+  "answer": "एन्नोर" },
+
+{ "question": "लौह अयस्क के निर्यात के लिए कौन सा बंदरगाह मुख्य है —", 
+  "options": ["कांडला", "मोरमुगाओ", "कोलकाता", "चेन्नई"], 
+  "answer": "मोरमुगाओ" },
+
+{ "question": "पारादीप बंदरगाह किस राज्य में स्थित है —", 
+  "options": ["आंध्र प्रदेश", "पश्चिम बंगाल", "ओडिशा", "तमिलनाडु"], 
+  "answer": "ओडिशा" },
+
+{ "question": "भारत का पहला ग्रीन पोर्ट किसे घोषित किया गया है —", 
+  "options": ["हल्दिया", "पारादीप", "एन्नोर", "विशाखापत्तनम"], 
+  "answer": "हल्दिया" },
+
+{ "question": "तूतीकोरिन बंदरगाह का नया नाम क्या है —", 
+  "options": ["वी.ओ. चिदंबरनार पोर्ट", "कामराजार पोर्ट", "दीनदयाल पोर्ट", "जवाहरलाल नेहरू पोर्ट"], 
+  "answer": "वी.ओ. चिदंबरनार पोर्ट" },
+
+{ "question": "ज्वारीय बंदरगाह (Tidal Port) कौन सा है —", 
+  "options": ["मुंबई", "कांडला", "कोच्चि", "चेन्नई"], 
+  "answer": "कांडला" },
+
+{ "question": "पोर्ट ब्लेयर बंदरगाह कहाँ स्थित है —", 
+  "options": ["लक्षद्वीप", "अंडमान और निकोबार", "पुडुचेरी", "दमन और दीव"], 
+  "answer": "अंडमान और निकोबार" },
+
+{ "question": "कोलकाता पोर्ट के भार को कम करने के लिए कौन सा सहायक बंदरगाह बनाया गया —", 
+  "options": ["पारादीप", "हल्दिया", "एन्नोर", "विशाखापत्तनम"], 
+  "answer": "हल्दिया" },
+
+{ "question": "न्यू मंगलौर बंदरगाह किस राज्य में है —", 
+  "options": ["केरल", "कर्नाटक", "गोवा", "महाराष्ट्र"], 
+  "answer": "कर्नाटक" },
+
+{ "question": "भारत के किस राज्य में सबसे अधिक प्रमुख बंदरगाह हैं —", 
+  "options": ["महाराष्ट्र", "गुजरात", "तमिलनाडु", "आंध्र प्रदेश"], 
+  "answer": "तमिलनाडु" },
+
+{ "question": "विशाखापत्तनम बंदरगाह किस लिए प्रसिद्ध है —", 
+  "options": ["कपड़ों के लिए", "जहाज निर्माण और गहराई", "रसायनों के लिए", "कृषि के लिए"], 
+  "answer": "जहाज निर्माण और गहराई" },
+
+{ "question": "मोरमुगाओ बंदरगाह किस नदी के मुहाने पर स्थित है —", 
+  "options": ["मांडवी", "जुआरी", "नर्मदा", "ताप्ती"], 
+  "answer": "जुआरी" },
+
+{ "question": "मुंद्रा पोर्ट किस राज्य में स्थित है —", 
+  "options": ["महाराष्ट्र", "गुजरात", "ओडिशा", "तमिलनाडु"], 
+  "answer": "गुजरात" },
+
+{ "question": "श्यामा प्रसाद मुखर्जी पोर्ट किस बंदरगाह का नया नाम है —", 
+  "options": ["मुंबई", "कोलकाता", "चेन्नई", "पारादीप"], 
+  "answer": "कोलकाता" },
+
+{ "question": "भारत का सबसे बड़ा प्राकृतिक बंदरगाह कौन सा है —", 
+  "options": ["कोच्चि", "मुंबई", "विशाखापत्तनम", "चेन्नई"], 
+  "answer": "मुंबई" },
+
+{ "question": "कामराजार पोर्ट का पुराना नाम क्या था —", 
+  "options": ["तूतीकोरिन", "एन्नोर", "चेन्नई", "कुड्डालोर"], 
+  "answer": "एन्नोर" },
+
+{ "question": "जापान को लौह अयस्क निर्यात के लिए कौन सा बंदरगाह मुख्य है —", 
+  "options": ["पारादीप", "कांडला", "मुंबई", "हल्दिया"], 
+  "answer": "पारादीप" },
+
+{ "question": "'कर्नाटक का प्रवेश द्वार' किसे कहा जाता है —", 
+  "options": ["कारवार", "न्यू मंगलौर", "कोच्चि", "पणम्बूर"], 
+  "answer": "न्यू मंगलौर" },
+
+{ "question": "कौन सा बंदरगाह पश्चिमी तट पर स्थित नहीं है —", 
+  "options": ["कांडला", "मुंबई", "पारादीप", "मंगलौर"], 
+  "answer": "पारादीप" },
+
+{ "question": "कौन सा बंदरगाह पूर्वी तट पर स्थित नहीं है —", 
+  "options": ["चेन्नई", "कोलकाता", "मोरमुगाओ", "विशाखापत्तनम"], 
+  "answer": "मोरमुगाओ" },
+
+{ "question": "सेतुसमुद्रम परियोजना किस बंदरगाह से संबंधित है —", 
+  "options": ["तूतीकोरिन", "कोच्चि", "चेन्नई", "विशाखापत्तनम"], 
+  "answer": "तूतीकोरिन" },
+
+{ "question": "भारत में छोटे बंदरगाहों की संख्या लगभग कितनी है —", 
+  "options": ["50", "100", "200", "500"], 
+  "answer": "200" }]
+  
+
+  // Logic
+  let currentQuestionIndex = 0;
+  let userAnswers = new Array(questions.length); 
+  let timer = null;
+  let timeLeft = 600; // 10 minutes
+  
+  // 🔥 फिक्स: छात्र का नाम ग्लोबल वेरिएबल में स्टोर किया गया
+  let studentName = ''; 
+
+  function formatTime(seconds) {
+    let minutes = Math.floor(seconds / 60);
+    let remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2,'0')}:${remainingSeconds.toString().padStart(2,'0')}`;
+  }
+
+  function startTest() {
+    const inputName = document.getElementById('studentName').value.trim(); // नाम को लोकल वेरिएबल में पढ़ें
+    if (!inputName) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Please enter your name to start.',
+        confirmButtonColor: '#4e54c8'
+      });
+      return;
+    }
+    
+    // 🔥 फिक्स: नाम को ग्लोबल वेरिएबल में स्टोर करें
+    studentName = inputName; 
+    
+    // Animate transition
+    document.getElementById('nameInput').style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById('nameInput').style.display = 'none';
+      const testContainer = document.getElementById('testContainer');
+      testContainer.style.display = 'block';
+      testContainer.style.opacity = 0;
+      
+      // Fade in test
+      setTimeout(() => { 
+        testContainer.style.opacity = 1; 
+        // 🔥 फिक्स: Top bar में नाम दिखाएं
+        document.getElementById('testTitle').textContent = `G.K. Test for: ${studentName}`;
+      }, 50);
+      
+      document.getElementById('timer').innerText = `⏱ ${formatTime(timeLeft)}`;
+      startTimer();
+      loadQuestion();
+    }, 300);
+  }
+
+  function startTimer() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timer').innerText = `⏱ ${formatTime(timeLeft)}`;
+      
+      // Visual warning for low time
+      if(timeLeft < 60) {
+        document.getElementById('timer').style.color = 'red';
+        document.getElementById('timer').style.background = '#ffe6e6';
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        Swal.fire({
+          icon: 'info',
+          title: 'Time Up!',
+          text: 'Submitting your test now...',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(()=> submitQuiz());
+      }
+    }, 1000);
+  }
+
+  function loadQuestion() {
+    const quizDiv = document.getElementById('quiz');
+    const q = questions[currentQuestionIndex];
+
+    // Card based options
+    const optionsHtml = q.options.map((opt, index) => {
+      const checked = userAnswers[currentQuestionIndex] === opt ? 'checked' : '';
+      const selectedClass = checked ? 'selected' : '';
+      const inputId = `opt_${index}`;
+      
+      return `
+        <label class="option-label ${selectedClass}" for="${inputId}" onclick="selectOption(this)">
+          <input id="${inputId}" type="radio" name="option" value="${opt}" ${checked} />
+          <div class="custom-radio"></div>
+          <span class="option-text">${opt}</span>
+        </label>
+      `;
+    }).join('');
+
+    quizDiv.innerHTML = `
+      <div class="question">
+        <span style="color:#8f94fb; margin-right:5px;">Q${currentQuestionIndex + 1}.</span> 
+        ${q.question}
+      </div>
+      <div class="options">${optionsHtml}</div>
+    `;
+
+    updateNextButton();
+    updateProgressBar();
+    updatePrevButtonState();
+  }
+
+  // Visual selection helper
+  function selectOption(labelElement) {
+    // remove selected class from siblings
+    const labels = document.querySelectorAll('.option-label');
+    labels.forEach(l => l.classList.remove('selected'));
+    // add to current
+    labelElement.classList.add('selected');
+    // Save immediately
+    const input = labelElement.querySelector('input');
+    userAnswers[currentQuestionIndex] = input.value;
+  }
+
+  function nextQuestion() {
+    if (currentQuestionIndex < questions.length - 1) {
+      currentQuestionIndex++;
+      loadQuestion();
+    } else {
+      submitQuiz();
+    }
+  }
+
+  function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      loadQuestion();
+    }
+  }
+
+  function updateNextButton() {
+    const nextBtn = document.getElementById('nextButton');
+    if (currentQuestionIndex === questions.length - 1) {
+      nextBtn.innerText = 'Submit Test';
+      nextBtn.style.backgroundColor = '#28a745'; // Green for submit
+    } else {
+      nextBtn.innerText = 'Next';
+      nextBtn.style.backgroundColor = 'var(--primary-color)';
+    }
+  }
+
+  function updatePrevButtonState(){
+    const prev = document.getElementById('prevBtn');
+    prev.disabled = currentQuestionIndex === 0;
+  }
+
+  function updateProgressBar() {
+    const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+    document.getElementById('progressBar').firstElementChild.style.width = `${progress}%`;
+  }
+
+  function submitQuiz() {
+    if (timer) clearInterval(timer);
+
+    let score = 0;
+    let summary = '';
+
+    for (let i = 0; i < questions.length; i++) {
+      const userAns = userAnswers[i] || 'Not Answered';
+      const correct = questions[i].answer;
+      const isCorrect = userAns === correct;
+      if (isCorrect) score++;
+      
+      summary += `
+        <div style="text-align:left; border-bottom:1px solid #eee; padding:10px 0;">
+          <div style="font-weight:600; color:#444; margin-bottom:4px;">${i+1}. ${questions[i].question}</div>
+          <div style="font-size:14px;">
+             Your Answer: <span style="color:${isCorrect ? '#28a745' : '#dc3545'}; font-weight:bold;">${userAns}</span>
+          </div>
+          ${!isCorrect ? `<div style="font-size:14px; color:#28a745;">Correct Answer: <b>${correct}</b></div>` : ''}
+        </div>`;
+    }
+
+    const percentage = Math.round((score / questions.length) * 100);
+    let greeting = percentage > 70 ? "Excellent Job!" : (percentage > 40 ? "Good Effort!" : "Keep Practicing!");
+
+    Swal.fire({
+      title: `<span style="font-size:24px">${greeting}</span>`,
+      html: `
+        <div style="font-size:20px; color:var(--primary-color); margin-bottom:15px; font-weight:700;">
+          ${studentName}
+        </div>
+        <div style="font-size:18px; color:#333; margin-bottom:10px;">
+          Score: <b>${score} / ${questions.length}</b> (${percentage}%)
+        </div>
+        <div style="max-height:300px; overflow-y:auto; background:#f9f9f9; padding:10px; border-radius:8px;">
+          ${summary}
+        </div>
+      `,
+      icon: percentage > 40 ? 'success' : 'warning',
+      confirmButtonText: 'Retake Test',
+      confirmButtonColor: 'var(--primary-color)',
+      width: '600px',
+      allowOutsideClick: false
+    }).then(() => {
+      location.reload();
+    });
+  }
+</script>
+</body>
+</html>
